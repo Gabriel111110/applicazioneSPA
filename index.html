@@ -13,701 +13,704 @@
 
 <body>
    <div id="container" class="container">
-      <div id="pagina1" class="page">
-         <div class="row"><p>Nella macchina di Von Neumann, la memoria &egrave; organizzata come un grosso array, ovvero una sequenza di celle ciascuna con un indirizzo assoluto (da 0 alla memoria massima allocabile). La memoria massima logica di un programma &egrave; in genere data dalla sua <span class="glossaryLink"  aria-describedby="tt"  data-cmtooltip="&lt;div class=glossaryItemTitle&gt;Architettura&lt;/div&gt;&lt;div class=glossaryItemBody&gt;&amp;lt;!-- wp:paragraph --&amp;gt;L&amp;#039;architettura di un sistema informatico indica il modo in cui &egrave; organizzato il software, di quali componenti e moduli &egrave; composto, che ruolo hanno e in che modo comunicano.&amp;lt;br/&amp;gt;&amp;lt;!-- /wp:paragraph --&amp;gt;&lt;/div&gt;"  data-gt-translate-attributes='[{"attribute":"data-cmtooltip", "format":"html"}]'  tabindex='0' role='link'>architettura</span>: i primi computer potevano avere pochi K di memoria, quelli moderni arrivano a decine di GB.</p>
-
-
-
-            <p><strong>La memoria &egrave; unica e</strong><strong>contiene sia le istruzioni che i dati</strong>, cio&egrave; le variabili, le strutture dati, i dati di input/ouput ed ogni dato di elaborazione del programma.</p>
-            
-            
-            
-            <p>In molte implementazioni il&nbsp;<strong>codice</strong>&nbsp;viene memorizzato nella parte bassa della memoria, e ci&ograve; avviene al caricamento del programma in memoria (da parte del sistema operativo).</p>
-            
-            
-            
-            <p>Il programma in esecuzione ha pieno accesso alla memoria, e quindi pu&ograve; leggere e scrivere in qualsiasi locazione di memoria, conoscendone il solo indirizzo, cio&egrave; la posizione in memoria. I programmi scritti in linguaggio ad alto livello hanno comunque meccanismi di protezione della memoria, e quando vengono eseguiti forniscono al programmatore direttamente l&rsquo;accesso a variabili e tipi di dato (numeri, stringhe, liste, ecc.).</p>
-            
-            
-            
-            <p>Internamente per&ograve; queste variabili vengono memorizzate nell&rsquo;area di memoria immediatamente &ldquo;sopra&rdquo; al codice, che viene chiamata &ldquo;<strong>heap</strong>&rdquo; (cumulo). Il programma alloca dello spazio in memoria, in base alle dimensioni delle strutture dati da utilizzare e agli algoritmi previsti da quel linguaggio ad alto livello (ad es. Java o Python).</p>
-            
-            
-            
-            <p>La memoria &ldquo;in alto&rdquo; invece viene utilizzata per memorizzare le chiamate ai&nbsp;<strong>sottoprogrammi</strong>&nbsp;(detti anche subroutine). I sottoprogrammi sono parti di un programma che possono essere eseguite pi&ugrave; volte in parti diverse del programma. Essi in genere svolgono compiti di utilit&agrave; e semplificano lo sviluppo di software, evitando di ripetere di scrivere lo stesso codice. Nei linguaggi ad alto livello sono chiamati in genere &ldquo;funzioni&rdquo;.</p>
-            
-            
-            
-            <p>Qui un esempio di chiamata di funzione (somma tra loro tutti gli interi compresi tra 1 a n):</p>
-            
-            
-            
-            <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>int sum(int n) {
-              int result = 0;
-              for (int i i=0; i&lt;n; i++) {
-                result += i;
-              }
-              return result;
-            }
-             
-            int s = sum(4);</code></pre></div>
-            
-            
-            
-            <p>Nella chiamata al sottoprogramma, il chiamante cede il controllo alla funzione del sottoprogramma, a cui passa eventualmente dei parametri. Alla fine tuttavia il chiamato deve restituire il controllo al chiamante, facendo eseguire l&rsquo;istruzione successiva alla chiamata.</p>
-            
-            
-            
-            <figure class="wp-block-image" id="block-929ded3786d64415afdf987c3388c237"><img decoding="async" src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-54c12d55-229f-4c83-b4b6-dd7d262e4443-7ba4473c-3f42-49c4-8b2e-fbb26e19d0d0-untitledpng/public" alt="notion image"/></figure>
-            
-            
-            
-            <p>Per poter eseguire quindi le chiamate ai sottoprogrammi occorre un &ldquo;meccanismo&rdquo; che memorizzi sia&nbsp;<strong>l&rsquo;indirizzo di ritorno</strong>&nbsp;della chiamata, sia i&nbsp;<strong>parametri</strong>&nbsp;o argomenti che questi possono ricevere. Inoltre se sono presenti vanno memorizzati anche eventuali&nbsp;<strong>valori di ritorno</strong>.</p>
-            
-            
-            
-            <p>Queste informazioni&nbsp;non si possono mettere in una posizione fissa della memoria, perch&egrave; anche un sottoprogramma ne pu&ograve; chiamare a sua volta un altro, e quindi deve poter anche lui memorizzare indirizzi di ritorno, parametri in ingresso e valori di ritorno. E&rsquo; necessaria una struttura dati dinamica, in memoria, che memorizzi queste informazioni, e che allo stesso tempo sia facile e veloce da utilizzare.</p>
-            
-            
-            
-            <p>Questo problema venne risolto brillantemente da Von Neumann facendo ricorso allo&nbsp;<strong>stack</strong>, una struttura matematica che si usa in programmazione.</p>
-            
-            
-            
-            <p>Vediamo di che si tratta.</p>
-            
-            
-            
-            <h2 class="wp-block-heading" id="block-982ff8432f894ad986b717d5ab3e7f30"><strong>Cos&rsquo;&egrave; lo stack?</strong></h2>
-            
-            
-            
-            <p>Lo stack (&ldquo;pila&rdquo;) &egrave; una struttura dati matematica che si usa in informatica per memorizzare liste di elementi secondo il principio LIFO (Last In First Out). In altri termini l&rsquo;accesso alla pila &egrave; solo tramite l&rsquo;ultimo elemento e le due uniche operazioni possibili sono:</p>
-            
-            
-            
-            <ul class="wp-block-list" id="block-e30979bd09104a148dcc2907c2523ac3">
-            <li><strong>push</strong>: aggiunta di un elemento</li>
-            
-            
-            
-            <li><strong>pop</strong>: estrazione di un elemento e sua rimozione</li>
-            </ul>
-            
-            
-            
-            <p>Esempio: ipotizziamo di avere all&rsquo;inizio uno stack vuoto (nessun elemento). Se eseguiamo PUSH (5) avremo:</p>
-            
-            
-            
-            <figure class="wp-block-image" id="block-d31167b3d2894a8e91c06d5da13c4956"><img decoding="async" src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-54c12d55-229f-4c83-b4b6-dd7d262e4443-a285551c-fc09-4067-a3e5-eb7f18db4362-untitledpng/public" alt="notion image"/></figure>
-            
-            
-            
-            <p>Lo stack contiene un solo elemento. Se eseguiamo una PUSH(7) avremo:</p>
-            
-            
-            
-            <figure class="wp-block-image" id="block-902dbdb2914e419cafd6a2c59748f3ff"><img decoding="async" src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-54c12d55-229f-4c83-b4b6-dd7d262e4443-dfd007f7-0838-480f-8fd4-ff2dee3d1747-untitledpng/public" alt="notion image"/></figure>
-            
-            
-            
-            <p>Ora sono due elementi. Se aggiungiamo ancora il valore 4&nbsp;&nbsp;con PUSH(4) avremo:</p>
-            
-            
-            
-            <figure class="wp-block-image" id="block-2dc42df7eb504f1b9a86ace70e58fc07"><img decoding="async" src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-54c12d55-229f-4c83-b4b6-dd7d262e4443-4ae1974e-9d7b-4ac3-af4a-2dbeaef964c3-untitledpng/public" alt="notion image"/></figure>
-            
-            
-            
-            <p>E cos&igrave; via. Ma attenzione, se eseguiamo POP() estrarremo l&rsquo;ultimo valore (cio&egrave; 4) e rimarr&agrave;:</p>
-            
-            
-            
-            <figure class="wp-block-image" id="block-cc0c423e06194139903d3e61c50b4b47"><img decoding="async" src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-54c12d55-229f-4c83-b4b6-dd7d262e4443-3bfdf2cd-90ef-4ca7-b2b7-5ceee4bb2c41-untitledpng/public" alt="notion image"/></figure>
-            
-            
-            
-            <p>La macchina di Von Neumann prevede un registro della CPU che si chiama&nbsp;<strong>SP</strong>&nbsp;(&ldquo;stack pointer&rdquo;) che contiene l&rsquo;indirizzo dell&rsquo;ultima cella dello stack.</p>
-            
-            
-            
-            <p>Quando un programma (o sottoprogramma) ha bisogno di chiamare un sottoprogramma, memorizza nello stack :</p>
-            
-            
-            
-            <p>1)&nbsp;<strong>indirizzo di ritorno</strong>&nbsp;(PUSH)</p>
-            
-            
-            
-            <p>2)&nbsp;<strong>parametri</strong>&nbsp;opzionali (PUSH)</p>
-            
-            
-            
-            <p>E poi chiama (nella CPU si modifica il PC) il sottoprogramma.</p>
-            
-            
-            
-            <p>Il sottoprogramma esegue la sua attivit&agrave;, SENZA conoscere informazioni sul chiamante, ma lavorando solo sui parametri presenti nello stack.</p>
-            
-            
-            
-            <p>Al termine della sua esecuzione (quando cio&egrave; viene richiamato &ldquo;return&rdquo;):</p>
-            
-            
-            
-            <p>3)&nbsp;<strong>estrae</strong>&nbsp;ed&nbsp;<strong>elimina</strong>&nbsp;i&nbsp;<strong>parametri</strong>&nbsp;(POP)</p>
-            
-            
-            
-            <p>4)&nbsp;<strong>estrae indirizzo di ritorno</strong>&nbsp;(POP)</p>
-            
-            
-            
-            <p>5)&nbsp;<strong>aggiunge eventuali valori di ritorno</strong>&nbsp;(PUSH)</p>
-            
-            
-            
-            <p>6) modifica il PC e quindi l&rsquo;istruzione successiva sar&agrave; quella successiva del chiamante.</p>
-            
-            
-            
-            <p>Il chiamante:</p>
-            
-            
-            
-            <p>7)&nbsp;<strong>estrae il valore di ritorno dallo stack</strong>&nbsp;(se presente) (POP)</p>
-            
-            
-            
-            <p>Lo stack (acceduto mediante SP) &egrave; quindi un meccanismo che permette di:</p>
-            
-            
-            
-            <ul class="wp-block-list" id="block-fd81cfc2da0748ee8c4e900615e52a80">
-            <li>scambiare dati tra chiamante e chiamato;</li>
-            
-            
-            
-            <li>memorizzare dati&nbsp;e poterli cancellare dinamicamente quando non servono pi&ugrave;, partendo dal pi&ugrave; recente;</li>
-            
-            
-            
-            <li>siccome &egrave; una pila, ogni procedura in esecuzione pu&ograve; a sua volta chiamare delle sottoprocedure.</li>
-            </ul>
-            
-            
-            
-            <p>La limitazione dello stack &egrave; ovviamente data dalla dimensione della memoria: se la memoria dello stack occupa memoria fino ad arrivare a raggiungere lo heap, succede una problematica che si chiama &ldquo;stack overflow&rdquo;. Di solito all&rsquo;avvio del programma viene memorizzato un limite superiore alla dimensione dello stack proprio per evitare questo tipo di problema, ed alcune architetture prevedono un riconoscimento hardware.</p>
-            
-            
-            
-            <p>Qui sotto lo schema riassuntivo che mostra cosa succede allo stack in una tipica chiamata di sottoprogramma.</p></div>
-         <div class="row"><a href="#pagina2">DIAGRAMMI DI FLUSSO</a></div>
-         <div class="row"><a href="#pagina3">MANIPOLAZIONE DI STRINGHE</a></div>                  
-      </div>
-      <div id="pagina2" class="page">
-         <div class="row"><a href="#pagina1">STACK</a></div>
-         <div class="row"><p><strong>Un programma per computer</strong>&nbsp;&egrave; un insieme di istruzioni codificate che il computer esegue per svolgere uno o pi&ugrave; determinati compiti. Si ricorda che un programma &egrave; memorizzato nella memoria centrale, viene eseguito dalla CPU, e funziona mediante l&rsquo;elaborazione di dati ed informazioni, che riceve dal mondo esterno tramite le periferiche di INPUT, come ad esempio la tastiera il mouse, e di OUTPUT, come ad esempio il monitor.&nbsp;</p>
-
-
-
-            <p>Le istruzioni di un programma eseguono un algoritmo, cio&egrave; una sequenza di istruzioni matematiche e logiche che permettono di ottenere un risultato partendo da dei dati e delle informazioni. I programmi pi&ugrave; complessi possono comprendere anche pi&ugrave; algoritmi che collaborano tra loro per svolgere operazioni complesse.</p>
-            
-            
-            
-            <p>Ricordiamo le 6 caratteristiche di un algoritmo:</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>correttezza</strong>: deve funzionare correttamente;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>generalit&agrave;</strong>: non deve dipendere da un set di dati particolare;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>finitezza</strong>: deve avere un numero finito di istruzioni per terminare;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>efficienza</strong>: non deve fare operazioni inutili;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>non ambiguit&agrave;</strong>: le istruzioni non devono essere ambigue o contradditorie;</p>
-            
-            
-            
-            <p><strong>&ndash; completezza</strong>: devono essere considerati tutti i casi possibili;</p>
-            
-            
-            
-            <p>Prima di poter scrivere un programma per computer &egrave; necessario quindi imparare a scrivere algoritmi, capirne le logiche di progettazione, imparare e gestire i dati e la loro elaborazione.</p>
-            
-            
-            
-            <p>Per questa ragione possiamo usare i diagrammi di flusso.</p>
-            
-            
-            
-            <h2 class="wp-block-heading"><strong>Diagrammi di flusso</strong></h2>
-            
-            
-            
-            <p>I diagrammi di flusso prevedono quattro simboli che indicano le quattro operazioni fondamentali di un algoritmo:</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>inizio</strong>&nbsp;o&nbsp;<strong>fine</strong>;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>input</strong>&nbsp;o&nbsp;<strong>output</strong>;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>assegnazione</strong>&nbsp;e/o&nbsp;<strong>calcolo</strong>&nbsp;di espressioni;</p>
-            
-            
-            
-            <p>&ndash; verifica di&nbsp;<strong>condizioni</strong>.</p>
-            
-            
-            
-            <p>Tutti i simboli sono connessi tra loro da frecce direzionali.</p>
-            
-            
-            
-            <figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="390" height="490" src="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-28.png" alt="" class="wp-image-452" srcset="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-28.png 390w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-28-239x300.png 239w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-28-230x289.png 230w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-28-350x440.png 350w" sizes="(max-width: 390px) 100vw, 390px"/></figure>
-            
-            
-            
-            <p>Tutti i simboli hanno un solo connettore in ingresso ed uno solo in uscita, tranne la condizione che ha due connettori in uscita.&nbsp;</p>
-            
-            
-            
-            <p>Come vedremo, possiamo rappresentare con questi quattro simboli qualsiasi programma per computer<a href="applewebdata://CAC4C9B7-F2B6-415E-92E1-EADAB6B00367#_ftn1"><sup>[1]</sup></a>.</p>
-            
-            
-            
-            <h3 class="wp-block-heading"><strong>Esempio: calcolo della somma di due numeri.</strong></h3>
-            
-            
-            
-            <p>Questo programma richiede in input due numeri a e b e restituisce un risultato c pari ad a+b.</p>
-            
-            
-            
-            <figure class="wp-block-image size-large"><img decoding="async" width="748" height="1024" src="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-748x1024.png" alt="" class="wp-image-453" srcset="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-748x1024.png 748w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-219x300.png 219w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-768x1052.png 768w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-230x315.png 230w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-350x479.png 350w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-480x657.png 480w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29.png 818w" sizes="(max-width: 748px) 100vw, 748px"/></figure>
-            
-            
-            
-            <p>Come si vede l&rsquo;utente interagisce con gli input output (parallelogramma), mentre la memoria del computer memorizza valori immessi in input (parallelogramma) oppure calcolati. Inoltre la memoria del computer contiene i valori inviati all&rsquo;utente tramite output.&nbsp;</p>
-            
-            
-            
-            <p>Per memorizzare valori introduciamo il concetto di&nbsp;<strong>variabile</strong>: una variabile &egrave; una area di memoria, identificata con un nome (detto&nbsp;<strong>identificatore</strong>, ad esempio &ldquo;a&rdquo; o &ldquo;b&rdquo;) che contiene un&nbsp;<strong>valore</strong>. Questo valore pu&ograve; cambiare anche nel corso del programma, per questo si chiama appunto &ldquo;variabile&rdquo;.</p>
-            
-            
-            
-            <p>E&rsquo; l&rsquo;utente che stabilisce il valore della variabile, quindi il programma deve funzionare senza conoscere il valore della variabile, per rispettare il principio di generalit&agrave;.</p>
-            
-            
-            
-            <h3 class="wp-block-heading"><strong>Esempio: pari o dispari</strong></h3>
-            
-            
-            
-            <p>Questo programma richiede un numero a, e dice se &egrave; pari o dispari.</p>
-            
-            
-            
-            <figure class="wp-block-image size-full"><img decoding="async" width="544" height="944" src="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30.png" alt="" class="wp-image-454" srcset="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30.png 544w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30-173x300.png 173w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30-230x399.png 230w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30-350x607.png 350w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30-480x833.png 480w" sizes="(max-width: 544px) 100vw, 544px"/></figure>
-            
-            
-            
-            <p>Come si vede, dopo l&rsquo;input, il programma effettua una verifica: &ldquo;a%2==0&rdquo;. Il simbolo &ldquo;%&rdquo; indica il resto della divisione, mentre &ldquo;==&rdquo; indica un confronto di uguaglianza. Questa espressione &egrave; VERA se a % 2 &egrave; uguale a 0, altrimenti &egrave; FALSA. Ad esempio, con a=4 l&rsquo;espressione &egrave; vera: a%2 &egrave; infatti uguale a 0. Invece con a=5, l&rsquo;espressione &egrave; FALSA.</p>
-            
-            
-            
-            <p>Come si vede, vengono rispettate tutte le caratteristiche di un algoritmo:</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>correttezza</strong>: qualsiasi sia il numero inserito, il risultato &egrave; corretto;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>generalit&agrave;</strong>: l&rsquo;algoritmo non dipende da un particolare input;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>finitezza</strong>: l&rsquo;algoritmo in qualsiasi caso termina in un numero finito di istruzioni;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>efficienza</strong>: l&rsquo;algoritmo non si perde in inutili calcoli.</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>non ambiguit&agrave;</strong>: non ci sono contraddizioni;</p>
-            
-            
-            
-            <p><strong>&ndash; completezza</strong>: sono considerati tutti i casi possibili;</p>
-            
-            
-            
-            <p><strong>Esempio: conta fino a n</strong></p>
-            
-            
-            
-            <p>In questo programma chiediamo all&rsquo;utente un numero n, ma stavolta stampiamo tutti i valori da 1 a n.</p>
-            
-            
-            
-            <p>Stavolta non basta calcolare una espressione, ma dobbiamo usare un contatore e soprattutto un ciclo.</p>
-            
-            
-            
-            <figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="380" height="902" src="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-31.png" alt="" class="wp-image-455" srcset="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-31.png 380w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-31-126x300.png 126w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-31-230x546.png 230w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-31-350x831.png 350w" sizes="auto, (max-width: 380px) 100vw, 380px"/></figure>
-            
-            
-            
-            <p>Vediamo i passaggi:</p>
-            
-            
-            
-            <p>1) Viene richiesto n</p>
-            
-            
-            
-            <p>2) La variabile i viene inizializzata ad 1.</p>
-            
-            
-            
-            <p>3) La variabile i viene stampata.</p>
-            
-            
-            
-            <p>4) i viene incrementata di 1.</p>
-            
-            
-            
-            <p>5) Se i &egrave; ancora minore o uguale a n, si torna al punto 3, altrimenti si va al punto 6</p>
-            
-            
-            
-            <p>6) fine.</p>
-            
-            
-            
-            <p>Ad esempio per n= 5 avremo:</p>
-            
-            
-            
-            <p>i=1 -&gt; si torna al punto 3 perch&egrave; i&lt;=5</p>
-            
-            
-            
-            <p>i=2 -&gt; si torna al punto 3 perch&egrave; i&lt;=5</p>
-            
-            
-            
-            <p>i=3 -&gt; si torna al punto 3 perch&egrave; i&lt;=5</p>
-            
-            
-            
-            <p>i=4 -&gt; si torna al punto 3 perch&egrave; i&lt;=5</p>
-            
-            
-            
-            <p>i=5 -&gt; si torna al punto 3 perch&egrave; i&lt;=5</p>
-            
-            
-            
-            <p>i=6 -&gt; si va al punto 7, perch&egrave; i &gt; 5</p>
-            
-            
-            
-            <p>I punti 3-4-5 vengono effettuati molte volte: per la precisione n volte.&nbsp;</p>
-            
-            
-            
-            <p>Ogni ripetizione si chiama&nbsp;<strong>ciclo</strong>.</p>
-            
-            
-            
-            <p>Il numero di cicli &egrave; determinato da n.&nbsp;</p>
-            
-            
-            
-            <p>Con n=10 avremo 10 cicli, con n=1000 avremo 1000 cicli e cos&igrave; via. E&rsquo; possibile anche avere milioni di cicli, scegliendo n molto grande.</p>
-            
-            
-            
-            <p>Come possiamo vedere anche un algoritmo semplice, con solo 7 passaggi come in questo diagramma di flusso, pu&ograve; portare all&rsquo;esecuzione, grazie ai cicli, di migliaia o milioni di cicli.</p>
-            
-            
-            
-            <p>Tuttavia l&rsquo;algoritmo mantiene sempre le sue quattro caratteristiche:</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>correttezza</strong>: qualsiasi sia il numero inserito, il risultato &egrave; corretto;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>generalit&agrave;</strong>: l&rsquo;algoritmo non dipende da un particolare input;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>finitezza</strong>: l&rsquo;algoritmo in qualsiasi caso termina in un numero finito di istruzioni;</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>efficienza</strong>: l&rsquo;algoritmo non si perde in inutili calcoli.</p>
-            
-            
-            
-            <p>&ndash;&nbsp;<strong>non ambiguit&agrave;</strong>: non ci sono contraddizioni;</p>
-            
-            
-            
-            <p><strong>&ndash; completezza</strong>: sono considerati tutti i casi possibili;</p></div>         
-         <div class="row"><a href="#pagina3">MANIPOLAZIONE DI STRINGHE</a></div>                  
-      </div>
-      <div id="pagina3" class="page">         
-         <div class="row"><a href="#pagina1">STACK</a></div>
-         <div class="row"><a href="#pagina2">DIAGRAMMI DI FLUSSO</a></div>                  
-         <div class="row">
-            <p>Le stringhe sono un&nbsp;<strong>tipo speciale di array</strong>.</p>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[] = { &lsquo;h&rsquo;, &lsquo;e&rsquo;, &lsquo;l&rsquo;, &lsquo;l&rsquo;, &lsquo;o&rsquo;, &lsquo;\0&rsquo; }</code></pre></div>
-
-
-
-<p>Crea una stringa di dimensione 6 (5 caratteri pi&ugrave; delimitazione). Notare il carattere di delimitazione (che corrisponde alla codifica 0 in ASCII). Questa notazione corrisponde alla seguente definizione:</p>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[] = &ldquo;Hello&rdquo;;</code></pre></div>
-
-
-
-<p>Nota bene: le espressioni definite da virgolette (ad esempio &ldquo;Hello&rdquo;) vengono chiamate &ldquo;<strong>literal</strong>&rdquo;.</p>
-
-
-
-<p>Pur essendo possibile assegnargli un valore in fase di creazione, un char[] gode di tutte le caratteristiche degli array. Quindi:</p>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>cout &lt;&lt; hello[2];  // stampa il 3&deg; carattere della stringa, cio&egrave; &lsquo;l&rsquo;</code></pre></div>
-
-
-
-<p>Vediamo altri tipi di inizializzazione e assegnazione.</p>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[50]; // crea una stringa di dimensione 50</code></pre></div>
-
-
-
-<p>In questa istruzione &egrave; stato creato un char array ma non viene inizializzato.</p>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char myString[30] = {0}; // inizializza una stringa con il carattere 0</code></pre></div>
-
-
-
-<p>In questa istruzione tutti i valori dell&rsquo;array vengono inizializzati ad un valore.</p>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[10] = &lsquo;hello&rsquo;; // crea una stringa di dimensione definita e le assegna un valore</code></pre></div>
-
-
-
-<p>A differenza della assegnazione senza dimensione (in quel caso &egrave; il compilatore C++ che auto inferisce la dimensione) &egrave; il programmatore che assegna una dimensione fissa.&nbsp;&nbsp;Quando si inizializza una stringa con un valore pi&ugrave; corta della dimensione definita i restanti caratteri vengono messi a 0.</p>
-
-
-
-<p>Ovvero la stringa conterr&agrave;:</p>
-
-
-
-<p>la stringa conterr&agrave;</p>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>{ &lsquo;h&rsquo;, &lsquo;e&rsquo;, &lsquo;l&rsquo;, &lsquo;l&rsquo;, &lsquo;o&rsquo;, &lsquo;\0&rsquo;, &lsquo;\0&rsquo;, &lsquo;\0&rsquo;, &lsquo;\0&rsquo;, &lsquo;\0&rsquo; }</code></pre></div>
-
-
-
-<p>Le stringhe possono essere usate per input ed output come se fossero semplici variabili:</p>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>cin &gt;&gt; hello;</code></pre></div>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>cout &lt;&lt; hello &lt;&lt; endl;</code></pre></div>
-
-
-
-<p>L&rsquo;inserimento tramite cin ha l&rsquo;inconveniente di terminare la stringa appena l&rsquo;utente inserisce uno spazio. Se si vuole inserire una intera linea compresa di spazi si usa&nbsp;<strong>cin.getline</strong>:</p>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>int size = 100;</code></pre></div>
-
-
-
-<p>char hello[size];</p>
-
-
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>cin.getline(hello, size);</code></pre></div>
-
-
-
-<p>dove&nbsp;<em>size</em>&nbsp;&egrave; la dimensione massima di caratteri inseribili (inferiore o uguale alla dimensione della stringa).</p>
-
-
-
-<h3 class="wp-block-heading"><strong>Cosa non si pu&ograve; fare con le stringhe?</strong></h3>
-
-
-
-<p>Non &egrave; possibile assegnare una stringa dopo averla inizializzata:</p>
+      <div id="ritorno alla home">
+         <div class="row"><a href="#pagina1"> TORNA ALLA PAGINA HOME</a></div>
+         <div id="pagina1" class="page">
+            <div class="row"><p>Nella macchina di Von Neumann, la memoria &egrave; organizzata come un grosso array, ovvero una sequenza di celle ciascuna con un indirizzo assoluto (da 0 alla memoria massima allocabile). La memoria massima logica di un programma &egrave; in genere data dalla sua <span class="glossaryLink"  aria-describedby="tt"  data-cmtooltip="&lt;div class=glossaryItemTitle&gt;Architettura&lt;/div&gt;&lt;div class=glossaryItemBody&gt;&amp;lt;!-- wp:paragraph --&amp;gt;L&amp;#039;architettura di un sistema informatico indica il modo in cui &egrave; organizzato il software, di quali componenti e moduli &egrave; composto, che ruolo hanno e in che modo comunicano.&amp;lt;br/&amp;gt;&amp;lt;!-- /wp:paragraph --&amp;gt;&lt;/div&gt;"  data-gt-translate-attributes='[{"attribute":"data-cmtooltip", "format":"html"}]'  tabindex='0' role='link'>architettura</span>: i primi computer potevano avere pochi K di memoria, quelli moderni arrivano a decine di GB.</p>
+
+
+
+               <p><strong>La memoria &egrave; unica e</strong><strong>contiene sia le istruzioni che i dati</strong>, cio&egrave; le variabili, le strutture dati, i dati di input/ouput ed ogni dato di elaborazione del programma.</p>
+               
+               
+               
+               <p>In molte implementazioni il&nbsp;<strong>codice</strong>&nbsp;viene memorizzato nella parte bassa della memoria, e ci&ograve; avviene al caricamento del programma in memoria (da parte del sistema operativo).</p>
+               
+               
+               
+               <p>Il programma in esecuzione ha pieno accesso alla memoria, e quindi pu&ograve; leggere e scrivere in qualsiasi locazione di memoria, conoscendone il solo indirizzo, cio&egrave; la posizione in memoria. I programmi scritti in linguaggio ad alto livello hanno comunque meccanismi di protezione della memoria, e quando vengono eseguiti forniscono al programmatore direttamente l&rsquo;accesso a variabili e tipi di dato (numeri, stringhe, liste, ecc.).</p>
+               
+               
+               
+               <p>Internamente per&ograve; queste variabili vengono memorizzate nell&rsquo;area di memoria immediatamente &ldquo;sopra&rdquo; al codice, che viene chiamata &ldquo;<strong>heap</strong>&rdquo; (cumulo). Il programma alloca dello spazio in memoria, in base alle dimensioni delle strutture dati da utilizzare e agli algoritmi previsti da quel linguaggio ad alto livello (ad es. Java o Python).</p>
+               
+               
+               
+               <p>La memoria &ldquo;in alto&rdquo; invece viene utilizzata per memorizzare le chiamate ai&nbsp;<strong>sottoprogrammi</strong>&nbsp;(detti anche subroutine). I sottoprogrammi sono parti di un programma che possono essere eseguite pi&ugrave; volte in parti diverse del programma. Essi in genere svolgono compiti di utilit&agrave; e semplificano lo sviluppo di software, evitando di ripetere di scrivere lo stesso codice. Nei linguaggi ad alto livello sono chiamati in genere &ldquo;funzioni&rdquo;.</p>
+               
+               
+               
+               <p>Qui un esempio di chiamata di funzione (somma tra loro tutti gli interi compresi tra 1 a n):</p>
+               
+               
+               
+               <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>int sum(int n) {
+               int result = 0;
+               for (int i i=0; i&lt;n; i++) {
+                  result += i;
+               }
+               return result;
+               }
+               
+               int s = sum(4);</code></pre></div>
+               
+               
+               
+               <p>Nella chiamata al sottoprogramma, il chiamante cede il controllo alla funzione del sottoprogramma, a cui passa eventualmente dei parametri. Alla fine tuttavia il chiamato deve restituire il controllo al chiamante, facendo eseguire l&rsquo;istruzione successiva alla chiamata.</p>
+               
+               
+               
+               <figure class="wp-block-image" id="block-929ded3786d64415afdf987c3388c237"><img decoding="async" src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-54c12d55-229f-4c83-b4b6-dd7d262e4443-7ba4473c-3f42-49c4-8b2e-fbb26e19d0d0-untitledpng/public" alt="notion image"/></figure>
+               
+               
+               
+               <p>Per poter eseguire quindi le chiamate ai sottoprogrammi occorre un &ldquo;meccanismo&rdquo; che memorizzi sia&nbsp;<strong>l&rsquo;indirizzo di ritorno</strong>&nbsp;della chiamata, sia i&nbsp;<strong>parametri</strong>&nbsp;o argomenti che questi possono ricevere. Inoltre se sono presenti vanno memorizzati anche eventuali&nbsp;<strong>valori di ritorno</strong>.</p>
+               
+               
+               
+               <p>Queste informazioni&nbsp;non si possono mettere in una posizione fissa della memoria, perch&egrave; anche un sottoprogramma ne pu&ograve; chiamare a sua volta un altro, e quindi deve poter anche lui memorizzare indirizzi di ritorno, parametri in ingresso e valori di ritorno. E&rsquo; necessaria una struttura dati dinamica, in memoria, che memorizzi queste informazioni, e che allo stesso tempo sia facile e veloce da utilizzare.</p>
+               
+               
+               
+               <p>Questo problema venne risolto brillantemente da Von Neumann facendo ricorso allo&nbsp;<strong>stack</strong>, una struttura matematica che si usa in programmazione.</p>
+               
+               
+               
+               <p>Vediamo di che si tratta.</p>
+               
+               
+               
+               <h2 class="wp-block-heading" id="block-982ff8432f894ad986b717d5ab3e7f30"><strong>Cos&rsquo;&egrave; lo stack?</strong></h2>
+               
+               
+               
+               <p>Lo stack (&ldquo;pila&rdquo;) &egrave; una struttura dati matematica che si usa in informatica per memorizzare liste di elementi secondo il principio LIFO (Last In First Out). In altri termini l&rsquo;accesso alla pila &egrave; solo tramite l&rsquo;ultimo elemento e le due uniche operazioni possibili sono:</p>
+               
+               
+               
+               <ul class="wp-block-list" id="block-e30979bd09104a148dcc2907c2523ac3">
+               <li><strong>push</strong>: aggiunta di un elemento</li>
+               
+               
+               
+               <li><strong>pop</strong>: estrazione di un elemento e sua rimozione</li>
+               </ul>
+               
+               
+               
+               <p>Esempio: ipotizziamo di avere all&rsquo;inizio uno stack vuoto (nessun elemento). Se eseguiamo PUSH (5) avremo:</p>
+               
+               
+               
+               <figure class="wp-block-image" id="block-d31167b3d2894a8e91c06d5da13c4956"><img decoding="async" src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-54c12d55-229f-4c83-b4b6-dd7d262e4443-a285551c-fc09-4067-a3e5-eb7f18db4362-untitledpng/public" alt="notion image"/></figure>
+               
+               
+               
+               <p>Lo stack contiene un solo elemento. Se eseguiamo una PUSH(7) avremo:</p>
+               
+               
+               
+               <figure class="wp-block-image" id="block-902dbdb2914e419cafd6a2c59748f3ff"><img decoding="async" src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-54c12d55-229f-4c83-b4b6-dd7d262e4443-dfd007f7-0838-480f-8fd4-ff2dee3d1747-untitledpng/public" alt="notion image"/></figure>
+               
+               
+               
+               <p>Ora sono due elementi. Se aggiungiamo ancora il valore 4&nbsp;&nbsp;con PUSH(4) avremo:</p>
+               
+               
+               
+               <figure class="wp-block-image" id="block-2dc42df7eb504f1b9a86ace70e58fc07"><img decoding="async" src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-54c12d55-229f-4c83-b4b6-dd7d262e4443-4ae1974e-9d7b-4ac3-af4a-2dbeaef964c3-untitledpng/public" alt="notion image"/></figure>
+               
+               
+               
+               <p>E cos&igrave; via. Ma attenzione, se eseguiamo POP() estrarremo l&rsquo;ultimo valore (cio&egrave; 4) e rimarr&agrave;:</p>
+               
+               
+               
+               <figure class="wp-block-image" id="block-cc0c423e06194139903d3e61c50b4b47"><img decoding="async" src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-54c12d55-229f-4c83-b4b6-dd7d262e4443-3bfdf2cd-90ef-4ca7-b2b7-5ceee4bb2c41-untitledpng/public" alt="notion image"/></figure>
+               
+               
+               
+               <p>La macchina di Von Neumann prevede un registro della CPU che si chiama&nbsp;<strong>SP</strong>&nbsp;(&ldquo;stack pointer&rdquo;) che contiene l&rsquo;indirizzo dell&rsquo;ultima cella dello stack.</p>
+               
+               
+               
+               <p>Quando un programma (o sottoprogramma) ha bisogno di chiamare un sottoprogramma, memorizza nello stack :</p>
+               
+               
+               
+               <p>1)&nbsp;<strong>indirizzo di ritorno</strong>&nbsp;(PUSH)</p>
+               
+               
+               
+               <p>2)&nbsp;<strong>parametri</strong>&nbsp;opzionali (PUSH)</p>
+               
+               
+               
+               <p>E poi chiama (nella CPU si modifica il PC) il sottoprogramma.</p>
+               
+               
+               
+               <p>Il sottoprogramma esegue la sua attivit&agrave;, SENZA conoscere informazioni sul chiamante, ma lavorando solo sui parametri presenti nello stack.</p>
+               
+               
+               
+               <p>Al termine della sua esecuzione (quando cio&egrave; viene richiamato &ldquo;return&rdquo;):</p>
+               
+               
+               
+               <p>3)&nbsp;<strong>estrae</strong>&nbsp;ed&nbsp;<strong>elimina</strong>&nbsp;i&nbsp;<strong>parametri</strong>&nbsp;(POP)</p>
+               
+               
+               
+               <p>4)&nbsp;<strong>estrae indirizzo di ritorno</strong>&nbsp;(POP)</p>
+               
+               
+               
+               <p>5)&nbsp;<strong>aggiunge eventuali valori di ritorno</strong>&nbsp;(PUSH)</p>
+               
+               
+               
+               <p>6) modifica il PC e quindi l&rsquo;istruzione successiva sar&agrave; quella successiva del chiamante.</p>
+               
+               
+               
+               <p>Il chiamante:</p>
+               
+               
+               
+               <p>7)&nbsp;<strong>estrae il valore di ritorno dallo stack</strong>&nbsp;(se presente) (POP)</p>
+               
+               
+               
+               <p>Lo stack (acceduto mediante SP) &egrave; quindi un meccanismo che permette di:</p>
+               
+               
+               
+               <ul class="wp-block-list" id="block-fd81cfc2da0748ee8c4e900615e52a80">
+               <li>scambiare dati tra chiamante e chiamato;</li>
+               
+               
+               
+               <li>memorizzare dati&nbsp;e poterli cancellare dinamicamente quando non servono pi&ugrave;, partendo dal pi&ugrave; recente;</li>
+               
+               
+               
+               <li>siccome &egrave; una pila, ogni procedura in esecuzione pu&ograve; a sua volta chiamare delle sottoprocedure.</li>
+               </ul>
+               
+               
+               
+               <p>La limitazione dello stack &egrave; ovviamente data dalla dimensione della memoria: se la memoria dello stack occupa memoria fino ad arrivare a raggiungere lo heap, succede una problematica che si chiama &ldquo;stack overflow&rdquo;. Di solito all&rsquo;avvio del programma viene memorizzato un limite superiore alla dimensione dello stack proprio per evitare questo tipo di problema, ed alcune architetture prevedono un riconoscimento hardware.</p>
+               
+               
+               
+               <p>Qui sotto lo schema riassuntivo che mostra cosa succede allo stack in una tipica chiamata di sottoprogramma.</p></div>
+            <div class="row"><a href="#pagina2">DIAGRAMMI DI FLUSSO</a></div>
+            <div class="row"><a href="#pagina3">MANIPOLAZIONE DI STRINGHE</a></div>                  
+         </div>
+         <div id="pagina2" class="page">
+            <div class="row"><a href="#pagina1">STACK</a></div>
+            <div class="row"><p><strong>Un programma per computer</strong>&nbsp;&egrave; un insieme di istruzioni codificate che il computer esegue per svolgere uno o pi&ugrave; determinati compiti. Si ricorda che un programma &egrave; memorizzato nella memoria centrale, viene eseguito dalla CPU, e funziona mediante l&rsquo;elaborazione di dati ed informazioni, che riceve dal mondo esterno tramite le periferiche di INPUT, come ad esempio la tastiera il mouse, e di OUTPUT, come ad esempio il monitor.&nbsp;</p>
+
+
+
+               <p>Le istruzioni di un programma eseguono un algoritmo, cio&egrave; una sequenza di istruzioni matematiche e logiche che permettono di ottenere un risultato partendo da dei dati e delle informazioni. I programmi pi&ugrave; complessi possono comprendere anche pi&ugrave; algoritmi che collaborano tra loro per svolgere operazioni complesse.</p>
+               
+               
+               
+               <p>Ricordiamo le 6 caratteristiche di un algoritmo:</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>correttezza</strong>: deve funzionare correttamente;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>generalit&agrave;</strong>: non deve dipendere da un set di dati particolare;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>finitezza</strong>: deve avere un numero finito di istruzioni per terminare;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>efficienza</strong>: non deve fare operazioni inutili;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>non ambiguit&agrave;</strong>: le istruzioni non devono essere ambigue o contradditorie;</p>
+               
+               
+               
+               <p><strong>&ndash; completezza</strong>: devono essere considerati tutti i casi possibili;</p>
+               
+               
+               
+               <p>Prima di poter scrivere un programma per computer &egrave; necessario quindi imparare a scrivere algoritmi, capirne le logiche di progettazione, imparare e gestire i dati e la loro elaborazione.</p>
+               
+               
+               
+               <p>Per questa ragione possiamo usare i diagrammi di flusso.</p>
+               
+               
+               
+               <h2 class="wp-block-heading"><strong>Diagrammi di flusso</strong></h2>
+               
+               
+               
+               <p>I diagrammi di flusso prevedono quattro simboli che indicano le quattro operazioni fondamentali di un algoritmo:</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>inizio</strong>&nbsp;o&nbsp;<strong>fine</strong>;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>input</strong>&nbsp;o&nbsp;<strong>output</strong>;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>assegnazione</strong>&nbsp;e/o&nbsp;<strong>calcolo</strong>&nbsp;di espressioni;</p>
+               
+               
+               
+               <p>&ndash; verifica di&nbsp;<strong>condizioni</strong>.</p>
+               
+               
+               
+               <p>Tutti i simboli sono connessi tra loro da frecce direzionali.</p>
+               
+               
+               
+               <figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="390" height="490" src="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-28.png" alt="" class="wp-image-452" srcset="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-28.png 390w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-28-239x300.png 239w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-28-230x289.png 230w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-28-350x440.png 350w" sizes="(max-width: 390px) 100vw, 390px"/></figure>
+               
+               
+               
+               <p>Tutti i simboli hanno un solo connettore in ingresso ed uno solo in uscita, tranne la condizione che ha due connettori in uscita.&nbsp;</p>
+               
+               
+               
+               <p>Come vedremo, possiamo rappresentare con questi quattro simboli qualsiasi programma per computer<a href="applewebdata://CAC4C9B7-F2B6-415E-92E1-EADAB6B00367#_ftn1"><sup>[1]</sup></a>.</p>
+               
+               
+               
+               <h3 class="wp-block-heading"><strong>Esempio: calcolo della somma di due numeri.</strong></h3>
+               
+               
+               
+               <p>Questo programma richiede in input due numeri a e b e restituisce un risultato c pari ad a+b.</p>
+               
+               
+               
+               <figure class="wp-block-image size-large"><img decoding="async" width="748" height="1024" src="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-748x1024.png" alt="" class="wp-image-453" srcset="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-748x1024.png 748w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-219x300.png 219w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-768x1052.png 768w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-230x315.png 230w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-350x479.png 350w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29-480x657.png 480w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-29.png 818w" sizes="(max-width: 748px) 100vw, 748px"/></figure>
+               
+               
+               
+               <p>Come si vede l&rsquo;utente interagisce con gli input output (parallelogramma), mentre la memoria del computer memorizza valori immessi in input (parallelogramma) oppure calcolati. Inoltre la memoria del computer contiene i valori inviati all&rsquo;utente tramite output.&nbsp;</p>
+               
+               
+               
+               <p>Per memorizzare valori introduciamo il concetto di&nbsp;<strong>variabile</strong>: una variabile &egrave; una area di memoria, identificata con un nome (detto&nbsp;<strong>identificatore</strong>, ad esempio &ldquo;a&rdquo; o &ldquo;b&rdquo;) che contiene un&nbsp;<strong>valore</strong>. Questo valore pu&ograve; cambiare anche nel corso del programma, per questo si chiama appunto &ldquo;variabile&rdquo;.</p>
+               
+               
+               
+               <p>E&rsquo; l&rsquo;utente che stabilisce il valore della variabile, quindi il programma deve funzionare senza conoscere il valore della variabile, per rispettare il principio di generalit&agrave;.</p>
+               
+               
+               
+               <h3 class="wp-block-heading"><strong>Esempio: pari o dispari</strong></h3>
+               
+               
+               
+               <p>Questo programma richiede un numero a, e dice se &egrave; pari o dispari.</p>
+               
+               
+               
+               <figure class="wp-block-image size-full"><img decoding="async" width="544" height="944" src="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30.png" alt="" class="wp-image-454" srcset="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30.png 544w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30-173x300.png 173w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30-230x399.png 230w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30-350x607.png 350w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-30-480x833.png 480w" sizes="(max-width: 544px) 100vw, 544px"/></figure>
+               
+               
+               
+               <p>Come si vede, dopo l&rsquo;input, il programma effettua una verifica: &ldquo;a%2==0&rdquo;. Il simbolo &ldquo;%&rdquo; indica il resto della divisione, mentre &ldquo;==&rdquo; indica un confronto di uguaglianza. Questa espressione &egrave; VERA se a % 2 &egrave; uguale a 0, altrimenti &egrave; FALSA. Ad esempio, con a=4 l&rsquo;espressione &egrave; vera: a%2 &egrave; infatti uguale a 0. Invece con a=5, l&rsquo;espressione &egrave; FALSA.</p>
+               
+               
+               
+               <p>Come si vede, vengono rispettate tutte le caratteristiche di un algoritmo:</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>correttezza</strong>: qualsiasi sia il numero inserito, il risultato &egrave; corretto;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>generalit&agrave;</strong>: l&rsquo;algoritmo non dipende da un particolare input;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>finitezza</strong>: l&rsquo;algoritmo in qualsiasi caso termina in un numero finito di istruzioni;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>efficienza</strong>: l&rsquo;algoritmo non si perde in inutili calcoli.</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>non ambiguit&agrave;</strong>: non ci sono contraddizioni;</p>
+               
+               
+               
+               <p><strong>&ndash; completezza</strong>: sono considerati tutti i casi possibili;</p>
+               
+               
+               
+               <p><strong>Esempio: conta fino a n</strong></p>
+               
+               
+               
+               <p>In questo programma chiediamo all&rsquo;utente un numero n, ma stavolta stampiamo tutti i valori da 1 a n.</p>
+               
+               
+               
+               <p>Stavolta non basta calcolare una espressione, ma dobbiamo usare un contatore e soprattutto un ciclo.</p>
+               
+               
+               
+               <figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="380" height="902" src="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-31.png" alt="" class="wp-image-455" srcset="https://cipiaceinfo.it/wp-content/uploads/2024/07/image-31.png 380w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-31-126x300.png 126w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-31-230x546.png 230w, https://cipiaceinfo.it/wp-content/uploads/2024/07/image-31-350x831.png 350w" sizes="auto, (max-width: 380px) 100vw, 380px"/></figure>
+               
+               
+               
+               <p>Vediamo i passaggi:</p>
+               
+               
+               
+               <p>1) Viene richiesto n</p>
+               
+               
+               
+               <p>2) La variabile i viene inizializzata ad 1.</p>
+               
+               
+               
+               <p>3) La variabile i viene stampata.</p>
+               
+               
+               
+               <p>4) i viene incrementata di 1.</p>
+               
+               
+               
+               <p>5) Se i &egrave; ancora minore o uguale a n, si torna al punto 3, altrimenti si va al punto 6</p>
+               
+               
+               
+               <p>6) fine.</p>
+               
+               
+               
+               <p>Ad esempio per n= 5 avremo:</p>
+               
+               
+               
+               <p>i=1 -&gt; si torna al punto 3 perch&egrave; i&lt;=5</p>
+               
+               
+               
+               <p>i=2 -&gt; si torna al punto 3 perch&egrave; i&lt;=5</p>
+               
+               
+               
+               <p>i=3 -&gt; si torna al punto 3 perch&egrave; i&lt;=5</p>
+               
+               
+               
+               <p>i=4 -&gt; si torna al punto 3 perch&egrave; i&lt;=5</p>
+               
+               
+               
+               <p>i=5 -&gt; si torna al punto 3 perch&egrave; i&lt;=5</p>
+               
+               
+               
+               <p>i=6 -&gt; si va al punto 7, perch&egrave; i &gt; 5</p>
+               
+               
+               
+               <p>I punti 3-4-5 vengono effettuati molte volte: per la precisione n volte.&nbsp;</p>
+               
+               
+               
+               <p>Ogni ripetizione si chiama&nbsp;<strong>ciclo</strong>.</p>
+               
+               
+               
+               <p>Il numero di cicli &egrave; determinato da n.&nbsp;</p>
+               
+               
+               
+               <p>Con n=10 avremo 10 cicli, con n=1000 avremo 1000 cicli e cos&igrave; via. E&rsquo; possibile anche avere milioni di cicli, scegliendo n molto grande.</p>
+               
+               
+               
+               <p>Come possiamo vedere anche un algoritmo semplice, con solo 7 passaggi come in questo diagramma di flusso, pu&ograve; portare all&rsquo;esecuzione, grazie ai cicli, di migliaia o milioni di cicli.</p>
+               
+               
+               
+               <p>Tuttavia l&rsquo;algoritmo mantiene sempre le sue quattro caratteristiche:</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>correttezza</strong>: qualsiasi sia il numero inserito, il risultato &egrave; corretto;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>generalit&agrave;</strong>: l&rsquo;algoritmo non dipende da un particolare input;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>finitezza</strong>: l&rsquo;algoritmo in qualsiasi caso termina in un numero finito di istruzioni;</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>efficienza</strong>: l&rsquo;algoritmo non si perde in inutili calcoli.</p>
+               
+               
+               
+               <p>&ndash;&nbsp;<strong>non ambiguit&agrave;</strong>: non ci sono contraddizioni;</p>
+               
+               
+               
+               <p><strong>&ndash; completezza</strong>: sono considerati tutti i casi possibili;</p></div>         
+            <div class="row"><a href="#pagina3">MANIPOLAZIONE DI STRINGHE</a></div>                  
+         </div>
+         <div id="pagina3" class="page">         
+            <div class="row"><a href="#pagina1">STACK</a></div>
+            <div class="row"><a href="#pagina2">DIAGRAMMI DI FLUSSO</a></div>                  
+            <div class="row">
+               <p>Le stringhe sono un&nbsp;<strong>tipo speciale di array</strong>.</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[] = { &lsquo;h&rsquo;, &lsquo;e&rsquo;, &lsquo;l&rsquo;, &lsquo;l&rsquo;, &lsquo;o&rsquo;, &lsquo;\0&rsquo; }</code></pre></div>
+
+
+
+   <p>Crea una stringa di dimensione 6 (5 caratteri pi&ugrave; delimitazione). Notare il carattere di delimitazione (che corrisponde alla codifica 0 in ASCII). Questa notazione corrisponde alla seguente definizione:</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[] = &ldquo;Hello&rdquo;;</code></pre></div>
+
+
+
+   <p>Nota bene: le espressioni definite da virgolette (ad esempio &ldquo;Hello&rdquo;) vengono chiamate &ldquo;<strong>literal</strong>&rdquo;.</p>
+
+
+
+   <p>Pur essendo possibile assegnargli un valore in fase di creazione, un char[] gode di tutte le caratteristiche degli array. Quindi:</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>cout &lt;&lt; hello[2];  // stampa il 3&deg; carattere della stringa, cio&egrave; &lsquo;l&rsquo;</code></pre></div>
+
+
+
+   <p>Vediamo altri tipi di inizializzazione e assegnazione.</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[50]; // crea una stringa di dimensione 50</code></pre></div>
+
+
+
+   <p>In questa istruzione &egrave; stato creato un char array ma non viene inizializzato.</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char myString[30] = {0}; // inizializza una stringa con il carattere 0</code></pre></div>
+
+
+
+   <p>In questa istruzione tutti i valori dell&rsquo;array vengono inizializzati ad un valore.</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[10] = &lsquo;hello&rsquo;; // crea una stringa di dimensione definita e le assegna un valore</code></pre></div>
+
+
+
+   <p>A differenza della assegnazione senza dimensione (in quel caso &egrave; il compilatore C++ che auto inferisce la dimensione) &egrave; il programmatore che assegna una dimensione fissa.&nbsp;&nbsp;Quando si inizializza una stringa con un valore pi&ugrave; corta della dimensione definita i restanti caratteri vengono messi a 0.</p>
+
+
+
+   <p>Ovvero la stringa conterr&agrave;:</p>
+
+
+
+   <p>la stringa conterr&agrave;</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>{ &lsquo;h&rsquo;, &lsquo;e&rsquo;, &lsquo;l&rsquo;, &lsquo;l&rsquo;, &lsquo;o&rsquo;, &lsquo;\0&rsquo;, &lsquo;\0&rsquo;, &lsquo;\0&rsquo;, &lsquo;\0&rsquo;, &lsquo;\0&rsquo; }</code></pre></div>
+
+
+
+   <p>Le stringhe possono essere usate per input ed output come se fossero semplici variabili:</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>cin &gt;&gt; hello;</code></pre></div>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>cout &lt;&lt; hello &lt;&lt; endl;</code></pre></div>
+
+
+
+   <p>L&rsquo;inserimento tramite cin ha l&rsquo;inconveniente di terminare la stringa appena l&rsquo;utente inserisce uno spazio. Se si vuole inserire una intera linea compresa di spazi si usa&nbsp;<strong>cin.getline</strong>:</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>int size = 100;</code></pre></div>
+
+
+
+   <p>char hello[size];</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>cin.getline(hello, size);</code></pre></div>
+
+
+
+   <p>dove&nbsp;<em>size</em>&nbsp;&egrave; la dimensione massima di caratteri inseribili (inferiore o uguale alla dimensione della stringa).</p>
+
+
+
+   <h3 class="wp-block-heading"><strong>Cosa non si pu&ograve; fare con le stringhe?</strong></h3>
+
+
+
+   <p>Non &egrave; possibile assegnare una stringa dopo averla inizializzata:</p>
+
+
+
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[10];
+   hello = &ldquo;ciao&rdquo;; // qui il compilatore da errore</code></pre></div>
 
 
-
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[10];
-hello = &ldquo;ciao&rdquo;; // qui il compilatore da errore</code></pre></div>
 
+   <p>Per assegnare valori ad una stringa (dopo la sua inizializzazione) si usa la libreria string.h, descritta sotto.</p>
 
 
-<p>Per assegnare valori ad una stringa (dopo la sua inizializzazione) si usa la libreria string.h, descritta sotto.</p>
 
+   <p>Non &egrave; nemmeno possibile eseguire la seguente istruzione:</p>
 
 
-<p>Non &egrave; nemmeno possibile eseguire la seguente istruzione:</p>
 
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[]; // errore!</code></pre></div>
 
 
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>char hello[]; // errore!</code></pre></div>
 
+   <p>Questo perch&eacute;, come visto sopra, se non assegnamo un valore il compilatore non pu&ograve; inferire la dimensione dell&rsquo;array.</p>
 
 
-<p>Questo perch&eacute;, come visto sopra, se non assegnamo un valore il compilatore non pu&ograve; inferire la dimensione dell&rsquo;array.</p>
 
+   <p>E&rsquo; tecnicamente possibile creare variabili stringa dinamiche in C++, ma &egrave; richiesto l&rsquo;utilizzo dei puntatori, argomento che va oltre la presente trattazione.</p>
 
 
-<p>E&rsquo; tecnicamente possibile creare variabili stringa dinamiche in C++, ma &egrave; richiesto l&rsquo;utilizzo dei puntatori, argomento che va oltre la presente trattazione.</p>
 
+   <h3 class="wp-block-heading"><strong>Libreria string.h</strong></h3>
 
 
-<h3 class="wp-block-heading"><strong>Libreria string.h</strong></h3>
 
+   <p>Le stringhe possono essere manipolate mediante speciali funzioni presenti nella libreria&nbsp;<strong>&lt;string.h&gt;</strong></p>
 
 
-<p>Le stringhe possono essere manipolate mediante speciali funzioni presenti nella libreria&nbsp;<strong>&lt;string.h&gt;</strong></p>
 
+   <figure class="wp-block-table"><table><tbody><tr><td><strong>Funzione</strong></td><td><strong>Utilizzo</strong></td></tr><tr><td><strong>strcpy(s1, s2);</strong></td><td>Copia s2 in s1: s2 pu&ograve; essere un literal.</td></tr><tr><td><strong>strcat(s1, s2);</strong></td><td>Concatena s2 alla fine di s1: s2 pu&ograve; essere un literal</td></tr><tr><td><strong>strlen(s1);</strong></td><td>Lunghezza di s1. La lunghezza si intende al carattere di terminazione.</td></tr><tr><td><strong>strcmp(s1, s2);</strong></td><td>Compara s1 con s2 (0 se identiche, &gt; 0 se se s1 &egrave; alfabeticamente successiva, &lt; 0 altrimenti). Possono una o entrambe dei literal.</td></tr><tr><td><strong>atoi(s1)</strong></td><td>Converte la stringa in intero. Pu&ograve; essere un literal.</td></tr><tr><td><strong>atof(s1)</strong></td><td>Converte la stringa in double. Pu&ograve; essere un literal.</td></tr><tr><td><strong>sprintf(s1, &ldquo;%d&rdquo;, n)</strong></td><td>Converte il numero n in stringa copiando il valore su s1. Nota s1 deve avere un sufficiente numero di caratteri per contenere il numero.</td></tr></tbody></table></figure>
 
 
-<figure class="wp-block-table"><table><tbody><tr><td><strong>Funzione</strong></td><td><strong>Utilizzo</strong></td></tr><tr><td><strong>strcpy(s1, s2);</strong></td><td>Copia s2 in s1: s2 pu&ograve; essere un literal.</td></tr><tr><td><strong>strcat(s1, s2);</strong></td><td>Concatena s2 alla fine di s1: s2 pu&ograve; essere un literal</td></tr><tr><td><strong>strlen(s1);</strong></td><td>Lunghezza di s1. La lunghezza si intende al carattere di terminazione.</td></tr><tr><td><strong>strcmp(s1, s2);</strong></td><td>Compara s1 con s2 (0 se identiche, &gt; 0 se se s1 &egrave; alfabeticamente successiva, &lt; 0 altrimenti). Possono una o entrambe dei literal.</td></tr><tr><td><strong>atoi(s1)</strong></td><td>Converte la stringa in intero. Pu&ograve; essere un literal.</td></tr><tr><td><strong>atof(s1)</strong></td><td>Converte la stringa in double. Pu&ograve; essere un literal.</td></tr><tr><td><strong>sprintf(s1, &ldquo;%d&rdquo;, n)</strong></td><td>Converte il numero n in stringa copiando il valore su s1. Nota s1 deve avere un sufficiente numero di caratteri per contenere il numero.</td></tr></tbody></table></figure>
 
+   <h2 class="wp-block-heading"><strong>STRTOK</strong></h2>
 
 
-<h2 class="wp-block-heading"><strong>STRTOK</strong></h2>
 
+   <p><strong>strtok</strong>&nbsp;&egrave; una funzione che estrae elementi di tipo stringa (detti &ldquo;<strong>token&rdquo;</strong>) da una stringa, a partire da un carattere separatore.&nbsp;</p>
 
 
-<p><strong>strtok</strong>&nbsp;&egrave; una funzione che estrae elementi di tipo stringa (detti &ldquo;<strong>token&rdquo;</strong>) da una stringa, a partire da un carattere separatore.&nbsp;</p>
 
+   <p>Esempio 1: dalla stringa&nbsp;<em>&ldquo;salve mondo&rdquo;</em>&nbsp;se eseguo&nbsp;strtok(stringa, &rdquo; &ldquo;)&nbsp;otterr&ograve; il token &ldquo;salve&rdquo;, in quanto la funzione estrae tutti caratteri da quella stringa fino al separatore (escluso).</p>
 
 
-<p>Esempio 1: dalla stringa&nbsp;<em>&ldquo;salve mondo&rdquo;</em>&nbsp;se eseguo&nbsp;strtok(stringa, &rdquo; &ldquo;)&nbsp;otterr&ograve; il token &ldquo;salve&rdquo;, in quanto la funzione estrae tutti caratteri da quella stringa fino al separatore (escluso).</p>
 
+   <p>Esempio 2: dalla stringa &ldquo;Mario,Sandra,Franco,Luisa&rdquo; se eseguo la funzione&nbsp;strtok(stringa, &ldquo;,&rdquo;)otterr&ograve; il token &ldquo;Mario&rdquo;.</p>
 
 
-<p>Esempio 2: dalla stringa &ldquo;Mario,Sandra,Franco,Luisa&rdquo; se eseguo la funzione&nbsp;strtok(stringa, &ldquo;,&rdquo;)otterr&ograve; il token &ldquo;Mario&rdquo;.</p>
 
+   <p>L&rsquo;obiettivo di Strtok &egrave; quello di permettere al programma di estrarre parole da una frase (esempio 1), o elementi da un elenco separato da virgole (esempio 2), o interpretare comandi veri e propri (&ldquo;3 + 5&rdquo;).</p>
 
 
-<p>L&rsquo;obiettivo di Strtok &egrave; quello di permettere al programma di estrarre parole da una frase (esempio 1), o elementi da un elenco separato da virgole (esempio 2), o interpretare comandi veri e propri (&ldquo;3 + 5&rdquo;).</p>
 
+   <p>Strtok non si limita ovviamente ad estrarre il primo token dalla lista, ma estrae anche i successivi. Se richiamato con primo argomento NULL continua ad estrarre token dalla stringa precedentemente usata, perch&egrave; &ldquo;si ricorda&rdquo; il punto a cui era arrivato.</p>
 
 
-<p>Strtok non si limita ovviamente ad estrarre il primo token dalla lista, ma estrae anche i successivi. Se richiamato con primo argomento NULL continua ad estrarre token dalla stringa precedentemente usata, perch&egrave; &ldquo;si ricorda&rdquo; il punto a cui era arrivato.</p>
 
+   <p>Vediamo un esempio pratico.</p>
 
 
-<p>Vediamo un esempio pratico.</p>
 
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>#include &lt;iostream&gt;
+   #include &lt;string.h&gt;&nbsp;
+   using namespace std;
+   int main()
+   {
+   char line[80];
+   cout &lt;&lt; &quot;Inserisci una riga: &quot;;
+   cin.getline(line, 80); // viene inserita la riga&nbsp;
+   char *token; // il token viene definito come un puntatore a un array di caratteri
+   token =&nbsp;strtok(line, &ldquo; &ldquo;);&nbsp;// prima esecuzione
+   while (token !=&nbsp;NULL) { // se non nullo si ripete
+      cout &lt;&lt; token &lt;&lt; endl;&nbsp;
+      token =&nbsp;strtok(NULL, &ldquo; &ldquo;);&nbsp;// esecuzioni successive
+   }
+   return 0;
+   }</code></pre></div>
 
 
-<div class="hcb_wrap"><pre class="prism line-numbers lang-cpp" data-lang="C++"><code>#include &lt;iostream&gt;
-#include &lt;string.h&gt;&nbsp;
-using namespace std;
-int main()
-{
-  char line[80];
-  cout &lt;&lt; &quot;Inserisci una riga: &quot;;
-  cin.getline(line, 80); // viene inserita la riga&nbsp;
-  char *token; // il token viene definito come un puntatore a un array di caratteri
-  token =&nbsp;strtok(line, &ldquo; &ldquo;);&nbsp;// prima esecuzione
-  while (token !=&nbsp;NULL) { // se non nullo si ripete
-    cout &lt;&lt; token &lt;&lt; endl;&nbsp;
-    token =&nbsp;strtok(NULL, &ldquo; &ldquo;);&nbsp;// esecuzioni successive
-  }
-  return 0;
-}</code></pre></div>
 
+   <p>Come si vede:</p>
 
 
-<p>Come si vede:</p>
 
+   <ul class="wp-block-list">
+   <li>&Egrave; necessario definire la variabile token come puntatore ad array.</li>
 
 
-<ul class="wp-block-list">
-<li>&Egrave; necessario definire la variabile token come puntatore ad array.</li>
 
+   <li>All&rsquo;estrazione del primo valore si usa strtok passandogli il nome della stringa da cui estrarre (SOLO la prima volta)</li>
 
 
-<li>All&rsquo;estrazione del primo valore si usa strtok passandogli il nome della stringa da cui estrarre (SOLO la prima volta)</li>
 
+   <li>Negli utilizzi successivi, si usa strtok passandogli il valore NULL. Strtok continua ad usare la stringa precedente, ed estrae ad ogni chiamata il token successivo.</li>
+   </ul>
 
 
-<li>Negli utilizzi successivi, si usa strtok passandogli il valore NULL. Strtok continua ad usare la stringa precedente, ed estrae ad ogni chiamata il token successivo.</li>
-</ul>
 
+   <p>Output:</p>
 
 
-<p>Output:</p>
 
+   <div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>Inserisci una riga: hello world
+   hello
+   world</code></pre></div>
+   <p>Qui il codice funzionante:&nbsp;<a href="https://onlinegdb.com/IfRb1gw_b">https://onlinegdb.com/IfRb1gw_b</a></p>
 
 
-<div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>Inserisci una riga: hello world
-hello
-world</code></pre></div>
-<p>Qui il codice funzionante:&nbsp;<a href="https://onlinegdb.com/IfRb1gw_b">https://onlinegdb.com/IfRb1gw_b</a></p>
 
+   <pre class="wp-block-code"><code></code></pre>
 
 
-<pre class="wp-block-code"><code></code></pre>
 
-
-
+            </div>
          </div>
       </div>
    </div>
